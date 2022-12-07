@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "807633533055",
+    "project_id": "fukl-48022-g51-2021-2-team3",
+    "storage_bucket": "fukl-48022-g51-2021-2-team3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807633533055:android:bbf97f76a362f9c74ca74a",
+        "android_client_info": {
+          "package_name": "com.ingDesing.MidnaApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807633533055-3u6np89i7v482rrm8tt28ca524e3ubdd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBijt1JW-At09g-DW7rwTjFFhvrynxAZIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807633533055-3u6np89i7v482rrm8tt28ca524e3ubdd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,86 @@
+# Android
+# Build your Android project with Gradle.
+# Add steps that test, sign, and distribute the APK, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/android
+
+trigger:
+  paths:
+    include:
+    - release/*
+    - master
+    - develop
+
+variables:
+  ProjectDirectory: '$(Build.SourcesDirectory)'
+  BuildMessage: '$(Build.SourceVersionMessage)'
+  BuildNumber: '1.0.0'
+  BuildName: 'V1.0.0-local'
+  APK_PATH: '/build/app/outputs/flutter-apk/app-release.apk'
+  BuildDirectory: '$(ProjectDirectory)$(APK_PATH)'
+
+pool:
+  vmImage: 'macos-latest'
+steps:
+- task: PowerShell@2
+  displayName: 'Setup variables (public)'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $BuildNumber = "$(Build.BuildNumber)".Split(".")[0]
+      Write-Host "##vso[task.setvariable variable=BuildNumber;]$BuildNumber"
+- task: FlutterInstall@0
+  inputs:
+    channel: 'stable'
+    version: 'latest'
+- task: FlutterBuild@0
+  displayName: 'Build Android App'
+  inputs:
+    target: 'apk'
+    projectDirectory: '$(ProjectDirectory)'
+    buildName: '$(BuildNumber)'
+    buildNumber: '$(BuildNumber)'
+- task: CopyFiles@2
+  displayName: 'Copy Build app to ArtifactStagingDirectory' 
+  inputs:    
+    contents: '$(BuildDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'AndroidApp'
+- script: |
+   rm -rf ./build/web
+  displayName: Remove oldest directory
+- task: FlutterBuild@0
+  displayName: Build Web App
+  inputs:
+    target: 'web'
+    projectDirectory: '$(ProjectDirectory)'
+#- task: FlutterCommand@0
+#  inputs:
+#    arguments: 'build web'
+#    projectDirectory: './'
+#  displayName: Build Web App
+- task: NodeTool@0
+  displayName: Installing Node
+  inputs:
+    versionSpec: '14.x'
+    checkLatest: true
+- script: |
+   npm install -g firebase-tools   
+   ls -laR ./build/web #recursively list directories
+   firebase deploy --token=$(FIREBASE_TOKEN) --project $(project) --only hosting
+  displayName: firebase deploy
+
+- task: AppCenterDistribute@3
+  inputs:
+    serverEndpoint: '48022-G51-2021-2-team3-android'
+    appSlug: '48022-G51-2021-2/josel.romerom'
+    appFile: '$(BuildDirectory)'
+    buildVersion: '$(BuildNumber)'
+    symbolsOption: 'Android'
+    releaseNotesOption: 'input'
+    releaseNotesInput: 'Build automatically'
+    destinationType: 'groups'
+    distributionGroupId: '1aa6846d-5e33-4699-938c-c18912677d22'
